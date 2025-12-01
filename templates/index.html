@@ -2,12 +2,37 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/static/image/logo.png">
+    <link rel="stylesheet" href="/static/css/style.css">
     <title>Groupie Tracker</title>
+
+    <link rel="stylesheet" img src="/static/image/logo.png">
 </head>
-<body>
-    <h1>Bienvenue sur Groupie Tracker</h1>
-    <p>Ceci est la page d'accueil.</p>
-    
+<body class="page">
+    <div class="container">
+<!-- Haut de la page "nav barre" -->
+        <header class="site-header">
+            <nav class="main-nav" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <a href="/" style="display: flex; align-items: center;">
+                    <img src="/static/image/logo.png" alt="Logo Groupie Tracker" class="logo" style="height: 48px; width: auto;">
+                </a>
+                <div style="display:flex; align-items:center; gap:24px;">
+                    <svg width="40" height="40" viewBox="0 0 50 50" fill="none" aria-hidden="true"></svg>
+                    <ul style="display:flex; gap:16px; list-style:none; margin:0; padding:0;">
+                        <li><a href="">À propos</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+<!-- contenue de la page -->
+        <main class="content">
+            <h1>The Groupie Tracker</h1>
+            <p>Ceci est la page d'accueil.</p>
+        </main>
+<!-- Bas de page -->
+        <footer class="site-footer">
+            <p>&copy; 2025 Groupie Tracker. Tous droits réservés.</p>
+        </footer>
+    </div>
 </body>
 </html>
