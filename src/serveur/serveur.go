@@ -13,6 +13,7 @@ func Serveur() {
 
 	// Handlers
 	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/artists", artistsHandler)
 
 	// Démarrage du serveur
 	fmt.Println("Serveur démarré sur http://localhost:8081")
