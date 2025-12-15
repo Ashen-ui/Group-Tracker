@@ -1,4 +1,4 @@
-package serveur
+package server
 
 import (
 	"fmt"
@@ -6,7 +6,8 @@ import (
 	"net/http"
 )
 
-func Serveur() {
+// La fonction Server démarre le serveur web
+func Server() {
 	// Fichiers statiques
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))

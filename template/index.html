@@ -27,7 +27,26 @@
 <!-- contenue de la page -->
         <main class="content">
             <h1>The Groupie Tracker</h1>
-            <p>Ceci est la page d'accueil.</p>
+            <p>Découvrez les artistes et leurs concerts</p>
+
+            <div class="artists-container">
+                {{ range . }}
+                <div class="artist-card">
+                    <img src="{{ .Image }}" alt="{{ .Name }}" class="artist-image">
+                    <div class="artist-info">
+                        <h2>{{ .Name }}</h2>
+                        <p><strong>Année de création:</strong> {{ .CreationDate }}</p>
+                        <p><strong>Premier album:</strong> {{ .FirstAlbum }}</p>
+                        <p><strong>Membres:</strong></p>
+                        <ul>
+                            {{ range .Members }}
+                            <li>{{ . }}</li>
+                            {{ end }}
+                        </ul>
+                    </div>
+                </div>
+                {{ end }}
+            </div>
         </main>
 <!-- Bas de page -->
         <footer class="site-footer">

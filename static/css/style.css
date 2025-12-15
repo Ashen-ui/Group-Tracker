@@ -66,3 +66,66 @@ body{
     border-radius:8px;
     background:transparent;
 }
+
+/* Artists Container */
+.artists-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+}
+
+/* Artist Card */
+.artist-card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 12px rgba(2,6,23,0.4);
+}
+
+.artist-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(94,234,212,0.15);
+}
+
+.artist-image {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    display: block;
+}
+
+.artist-info {
+    padding: 16px;
+}
+
+.artist-info h2 {
+    color: var(--accent);
+    margin-bottom: 12px;
+    font-size: 1.4rem;
+}
+
+.artist-info p {
+    margin-bottom: 8px;
+    color: rgba(255,255,255,0.85);
+}
+
+.artist-info ul {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 8px;
+}
+
+.artist-info ul li {
+    padding: 4px 0;
+    color: rgba(255,255,255,0.75);
+    font-size: 0.9rem;
+}
+
+.content p {
+    text-align: center;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 16px;
+}

@@ -1,7 +1,8 @@
 package main
 
-import "group-tracker/src/serveur"
+import "group-tracker/src/server"
 
+// Déploiement du serveur
 func main() {
-	serveur.Serveur()
+	server.Server()
 }
