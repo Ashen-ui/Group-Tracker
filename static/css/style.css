@@ -19,7 +19,7 @@ body{
 }
 
 /* wrapper */
-.container{
+.containeer{
     width:100%;
     max-width:100%;
     margin:0;
@@ -27,6 +27,16 @@ body{
     flex-direction:column;
     gap:var(--gap);
     min-height:60vh;
+}
+
+.container {
+    width:100%;
+    max-width:100%;
+    margin:0;
+    display:flex;
+    gap:var(--gap);
+    min-height:60vh;
+    flex-wrap: wrap;
 }
 
 /* header */

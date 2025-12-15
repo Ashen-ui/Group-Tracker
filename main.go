@@ -2,22 +2,17 @@ package main
 
 import (
 	"fmt"
+	"group-tracker/src/modules"
 	"group-tracker/src/serveur"
 	"io/ioutil"
 	"net/http"
 )
 
 func main() {
-
+	modules.Test() // metre cette ligne en commentaire si tu veux pas tester la fonction recherche
 	urlbase := "https://groupietrackers.herokuapp.com/api/artists"
 	// slice de urlbase pour chaque id possible
-	URLs := []string{}
-	for i := 1; i <= 52; i++ {
-		URLs = append(URLs, fmt.Sprintf("%s/%d", urlbase, i))
-	}
-	for _, url := range URLs {
-		fmt.Println(url)
-	}
+
 	response, err := http.Get(urlbase + "/1")
 	if err != nil {
 

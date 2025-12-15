@@ -8,7 +8,7 @@
     <title>Groupie Tracker</title>
 </head>
 <body class="page">
-    <div class="container">
+    <div class="containeer">
         <header class="site-header">
             <nav class="main-nav" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                 <a href="/" style="display: flex; align-items: center;">
@@ -34,10 +34,9 @@
             <section>
                 <h2>Liste des artistes</h2>
                 <div>Total des artistes trouvés: {{len .Artists}}</div>
-                <ul class="artist-list" style="list-style:none; padding:0; margin:0;">
+                <ul class=container>
                     {{range .Artists}}
                     <li style="display:flex; align-items:center; gap:12px; margin:8px 0;">
-                        <!-- metre le nom au dessu des artiste pas a coter -->
                         <div style="column-gap:12px; display:flex; flex-direction: column; align-items:center;">
                             <a href="/artists?id={{.ID}}" style="color:inherit; text-decoration:none;">{{.Name}}</a>
                             <img src="{{.Image}}" alt="{{.Name}}" style="height:48px; width:auto; border-radius:6px; object-fit:cover;">
