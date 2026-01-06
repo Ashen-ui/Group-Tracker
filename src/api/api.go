@@ -2,14 +2,14 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
+	"strings"
 )
 
-// URL de base de l'API
 const BaseURL = "https://groupietrackers.herokuapp.com/api"
 
-// La structure Artist représente un artiste/groupe
 type Artist struct {
 	ID           int      `json:"id"`
 	Image        string   `json:"image"`
@@ -22,26 +22,22 @@ type Artist struct {
 	Relations    string   `json:"relations"`
 }
 
-// La structure Location représente les lieux de concert
 type Location struct {
 	ID        int      `json:"id"`
 	Locations []string `json:"locations"`
 	Dates     string   `json:"dates"`
 }
 
-// La structure Date représente les dates de concert
 type Date struct {
 	ID    int      `json:"id"`
 	Dates []string `json:"dates"`
 }
 
-// La structure Relation représente la relation entre dates et lieux
 type Relation struct {
 	ID             int                 `json:"id"`
 	DatesLocations map[string][]string `json:"datesLocations"`
 }
 
-// La fonction GetArtists récupère tous les artistes depuis l'API
 func GetArtists() ([]Artist, error) {
 	resp, err := http.Get(BaseURL + "/artists")
 	if err != nil {
@@ -63,7 +59,6 @@ func GetArtists() ([]Artist, error) {
 	return artists, nil
 }
 
-// La fonction GetLocations récupère toutes les locations depuis l'API
 func GetLocations() ([]Location, error) {
 	resp, err := http.Get(BaseURL + "/locations")
 	if err != nil {
@@ -87,7 +82,6 @@ func GetLocations() ([]Location, error) {
 	return result.Index, nil
 }
 
-// La fonction GetDates récupère toutes les dates depuis l'API
 func GetDates() ([]Date, error) {
 	resp, err := http.Get(BaseURL + "/dates")
 	if err != nil {
@@ -111,7 +105,6 @@ func GetDates() ([]Date, error) {
 	return result.Index, nil
 }
 
-// La fonction GetRelations récupère toutes les relations depuis l'API
 func GetRelations() ([]Relation, error) {
 	resp, err := http.Get(BaseURL + "/relation")
 	if err != nil {
@@ -133,4 +126,23 @@ func GetRelations() ([]Relation, error) {
 	}
 
 	return result.Index, nil
+}
+
+// Barre de recherche
+func SearchBar(name string) (Artist, error) {
+	artists, err := GetArtists()
+	if err != nil {
+		return Artist{}, err
+	}
+	nameLower := strings.ToLower(strings.TrimSpace(name))
+	if nameLower == "" {
+		return Artist{}, errors.New("nom de recherche vide")
+	}
+	for _, artist := range artists {
+		artistNameLower := strings.ToLower(artist.Name)
+		if artistNameLower == nameLower || strings.Contains(artistNameLower, nameLower) {
+			return artist, nil
+		}
+	}
+	return Artist{}, errors.New("artist not found")
 }

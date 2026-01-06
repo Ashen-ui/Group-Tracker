@@ -7,46 +7,54 @@
     <title>Groupie Tracker</title>
 </head>
 <body class="page">
-    <div class="container">
-<!-- Haut de la page "nav barre" -->
-        <header class="site-header">
-            <nav class="main-nav" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                <a href="/" style="display: flex; align-items: center;">
-                    <img src="/static/image/logo.png" alt="Logo Groupie Tracker" class="logo" style="height: 48px; width: auto;">
-                </a>
-                <div style="display:flex; align-items:center; gap:24px;">
-                    <svg width="40" height="40" viewBox="0 0 50 50" fill="none" aria-hidden="true"></svg>
-                    <ul style="display:flex; gap:16px; list-style:none; margin:0; padding:0;">
-                        <li><a href="">À propos</a></li>
-                    </ul>
-                </div>
+    <header class="site-header">
+        <div class="header-content">
+            <div class="header-logo">
+                <img src="/static/image/logo.png" alt="Logo Groupie Tracker" class="logo">
+                <span class="logo-text">Groupie Tracker</span>
+            </div>
+            <nav class="header-nav">
+                <a href="/" class="nav-link">Accueil</a>
+                <a href="/about" class="nav-link">À propos</a>
             </nav>
-        </header>
-<!-- contenue de la page -->
+        </div>
+    </header>
+    <div class="container">
         <main class="content">
-            <h1>The Groupie Tracker</h1>
-            <p>Découvrez les artistes et leurs concerts</p>
-
-            <div class="artists-container">
-                {{ range . }}
-                <div class="artist-card">
-                    <img src="{{ .Image }}" alt="{{ .Name }}" class="artist-image">
-                    <div class="artist-info">
-                        <h2>{{ .Name }}</h2>
-                        <p><strong>Année de création:</strong> {{ .CreationDate }}</p>
-                        <p><strong>Premier album:</strong> {{ .FirstAlbum }}</p>
-                        <p><strong>Membres:</strong></p>
-                        <ul>
-                            {{ range .Members }}
-                            <li>{{ . }}</li>
-                            {{ end }}
-                        </ul>
-                    </div>
+            <div class="page-header">
+                <h1>The Groupie Tracker</h1>
+                <p>Découvrez les artistes et leurs concerts</p>
+                <form method="GET" action="/search" class="search-form">
+                    <input type="text" name="name" placeholder="Rechercher un artiste..." class="search-input">
+                    <button type="submit" class="search-button">Rechercher</button>
+                </form>
+            </div>
+            <div class="artists-section">
+                <div class="artists-stats">
+                    <span>{{ len . }} artiste{{ if ne (len .) 1 }}s{{ end }} disponible{{ if ne (len .) 1 }}s{{ end }}</span>
                 </div>
-                {{ end }}
+                <div class="artists-container">
+                    {{ range . }}
+                    <div class="artist-card">
+                        <img src="{{ .Image }}" alt="{{ .Name }}" class="artist-image">
+                        <div class="artist-info">
+                            <h2>{{ .Name }}</h2>
+                            <p><strong>Année de création:</strong> {{ .CreationDate }}</p>
+                            <p><strong>Premier album:</strong> {{ .FirstAlbum }}</p>
+                            <div class="members-section">
+                                <p><strong>Membres:</strong></p>
+                                <ul>
+                                    {{ range .Members }}
+                                    <li>{{ . }}</li>
+                                    {{ end }}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {{ end }}
+                </div>
             </div>
         </main>
-<!-- Bas de page -->
         <footer class="site-footer">
             <p>&copy; 2025 Groupie Tracker. Tous droits réservés.</p>
         </footer>
