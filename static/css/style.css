@@ -5,11 +5,11 @@
     --accent:#5eead4;
     --text:#e6eef6;
     --radius:10px;
-    --gap:16px;
+    --gap:3%;
     --container:1100px;
 }
 
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;}
 html,body{min-height:100%}
 body{
     font-family: Inter, system-ui, Arial;
@@ -54,7 +54,6 @@ body{
 /* main */
 .content{
     flex:1;
-    padding:22px;
     border-radius:calc(var(--radius) * 0.9);
     background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
     border:1px solid rgba(255,255,255,0.02);
@@ -76,4 +75,13 @@ body{
     font-size:0.95rem;
     border-radius:8px;
     background:transparent;
+}
+
+.Artist-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid rgb(255, 255, 255);
+    width: 30%;
+    margin-bottom: 1%;
 }

@@ -34,15 +34,19 @@
         <main class="content">
             <h1 style="font-size: 4em">The Groupie Tracker</h1>   
             <section>
-                <h2>Liste des artistes :</h2>
+                <h2>Liste des artistes</h2>
                 <div>Total des artistes trouvés: {{len .Artists}}</div>
                 <ul class=container>
                     {{range .Artists}}
-                    <li style="display:flex; align-items:center; gap:12px; margin:8px 0;">
-                        <a href="/artists?id={{.Groupe.ID}}" style="color:inherit; text-decoration:none; display:flex; flex-direction:column; align-items:center; column-gap:12px;">
-                            <span>{{.Groupe.Name}}</span>
-                            <img src="{{.Groupe.Image}}" alt="{{.Groupe.Name}}" style="height:48px; width:auto; border-radius:6px; object-fit:cover;">
-                        </a>
+                    <li class="Artist-container">
+                            <img src="{{.Groupe.Image}}" alt="{{.Groupe}}" style="border-radius:6px; object-fit:cover;width:60%;margin-top: 5%;">
+                            <a href="/artists?query={{.Groupe.Name}}" style="color:inherit; text-decoration:none; color: #265093;">{{.Groupe.Name}}</a>
+                            <h6 style="margin:  10px;"> Membres:</h6>
+                            <div style="display:flex; flex-direction:column; gap:4px; align-items: flex-start;">
+                                {{range .Groupe.Members}}
+                                    <span >{{.}}</span>
+                                {{end}} 
+                            </div>
                     </li>
                     {{else}}
                     <li>Aucun artiste trouvé.</li>

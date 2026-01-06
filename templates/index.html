@@ -37,11 +37,15 @@
                 <div>Total des artistes trouvés: {{len .Artists}}</div>
                 <ul class=container>
                     {{range .Artists}}
-                    <li style="display:flex; align-items:center; gap:12px; margin:8px 0;">
-                        <div style="column-gap:12px; display:flex; flex-direction: column; align-items:center;">
-                            <a href="/artists?id={{.ID}}" style="color:inherit; text-decoration:none;">{{.Name}}</a>
-                            <img src="{{.Image}}" alt="{{.Name}}" style="height:48px; width:auto; border-radius:6px; object-fit:cover;">
-                        </div>
+                    <li class="Artist-container">
+                            <img src="{{.Image}}" alt="{{.Name}}" style="border-radius:6px; object-fit:cover;width:60%;margin-top: 5%;">
+                            <a href="/artists?query={{.Name}}" style="color:inherit; text-decoration:none; color: #265093;">{{.Name}}</a>
+                            <h6 style="margin:  10px;"> Membres:</h6>
+                            <div style="display:flex; flex-direction:column; gap:4px; align-items: flex-start;">
+                                {{range .Members}}
+                                    <span >{{.}}</span>
+                                {{end}} 
+                            </div>
                     </li>
                     {{else}}
                     <li>Aucun artiste trouvé.</li>
