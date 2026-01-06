@@ -60,16 +60,17 @@ func FetchAllArtists() ([]Artist, error) {
 }
 
 type Resultat struct {
-	Groupe Artist //le nom du groupe trouvé
+	Groupe Artist //le groupe trouvé
 	Where  string //le champ où le mot clef a été trouvé savoir si c est le nom du groupe ou un des membres
+	Name   string // le "nom" trouver
 }
 
 // mot clef = se que tu met dans la bare de recherche ex: "queen"
 //
 // artists = la liste de tout les artistes récupérés par FetchAllArtists
 func Recherche(motclef string, artists []Artist) []Resultat {
-
 	var rep []Resultat
+	var name string
 	motclef = strings.ToLower(strings.TrimSpace(motclef))
 	if motclef == "" {
 		return rep
@@ -79,38 +80,20 @@ func Recherche(motclef string, artists []Artist) []Resultat {
 
 		if strings.Contains(strings.ToLower(artist.Name), motclef) {
 			where = "name"
+			name = artist.Name
 		}
 
 		for _, member := range artist.Members {
 			if strings.Contains(strings.ToLower(member), motclef) {
 				where = "members"
+				name = member
 				break
 			}
 		}
 
 		if len(where) > 0 {
-			rep = append(rep, Resultat{Groupe: artist, Where: where})
+			rep = append(rep, Resultat{Groupe: artist, Where: where, Name: name})
 		}
 	}
 	return rep
-}
-
-func Test() {
-	//test de la fonction recherche
-	//pas obliger de les utilier dans le main.go mais c est pour tester
-	var artists []Artist
-	var err error
-	artists, err = FetchAllArtists()
-	if err != nil {
-		return
-	}
-	result := Recherche("Q", artists)
-	println("------------------- debut du test -------------------------------")
-	println(len(result))
-	println(result)
-	for i := range result {
-		println("Artiste trouvé :", result[i].Groupe.Name)
-		println("Champs correspondants :", result[i].Where)
-	}
-	println("------------------- fin du  test -------------------------------")
 }

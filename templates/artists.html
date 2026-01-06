@@ -9,7 +9,7 @@
     <link rel="stylesheet" img src="/static/image/logo.png">
 </head>
 <body class="page">
-    <div class="container">
+    <div class="containeer">
 <!-- Haut de la page "nav barre" -->
         <header class="site-header">
             <nav class="main-nav" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
@@ -28,13 +28,27 @@
                         <li><a href="">À propos</a></li>
                     </ul>
                 </div>
-            </nav>
+            </nav>  
         </header>
 <!-- Contenue de la page -->
-        <main class="content">  
-            <h1>The Groupie Tracker</h1>
-            <p>Ceci est la page des artistes.</p>
-            
+        <main class="content">
+            <h1 style="font-size: 4em">The Groupie Tracker</h1>   
+            <section>
+                <h2>Liste des artistes :</h2>
+                <div>Total des artistes trouvés: {{len .Artists}}</div>
+                <ul class=container>
+                    {{range .Artists}}
+                    <li style="display:flex; align-items:center; gap:12px; margin:8px 0;">
+                        <a href="/artists?id={{.Groupe.ID}}" style="color:inherit; text-decoration:none; display:flex; flex-direction:column; align-items:center; column-gap:12px;">
+                            <span>{{.Groupe.Name}}</span>
+                            <img src="{{.Groupe.Image}}" alt="{{.Groupe.Name}}" style="height:48px; width:auto; border-radius:6px; object-fit:cover;">
+                        </a>
+                    </li>
+                    {{else}}
+                    <li>Aucun artiste trouvé.</li>
+                    {{end}}
+                </ul>
+            </section>
         </main>
 <!-- Bas de page -->
         <footer class="site-footer">

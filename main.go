@@ -2,14 +2,12 @@ package main
 
 import (
 	"fmt"
-	"group-tracker/src/modules"
 	"group-tracker/src/serveur"
 	"io/ioutil"
 	"net/http"
 )
 
 func main() {
-	modules.Test() // metre cette ligne en commentaire si tu veux pas tester la fonction recherche
 	urlbase := "https://groupietrackers.herokuapp.com/api/artists"
 	// slice de urlbase pour chaque id possible
 
