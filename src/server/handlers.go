@@ -14,9 +14,9 @@ import (
 var mu sync.Mutex
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	// Ne pas traiter les requêtes vers /artists/
-	if strings.HasPrefix(r.URL.Path, "/artists/") {
-		log.Printf("indexHandler: requête vers /artists/ ignorée: %s", r.URL.Path)
+	// Ne pas traiter les requêtes vers /artists/, /about ou /search
+	if strings.HasPrefix(r.URL.Path, "/artists/") || r.URL.Path == "/about" || r.URL.Path == "/search" {
+		log.Printf("indexHandler: requête ignorée: %s", r.URL.Path)
 		return
 	}
 	mu.Lock()
@@ -46,6 +46,47 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Page servie avec succès")
 }
 
+func aboutHandler(w http.ResponseWriter, r *http.Request) {
+	mu.Lock()
+	defer mu.Unlock()
+	log.Printf("aboutHandler: Requête reçue: %s %s", r.Method, r.URL.Path)
+
+	// Contenu par défaut pour la page À propos
+	readmeContent := `Groupie Tracker
+
+Bienvenue sur Groupie Tracker, une application web permettant de découvrir 
+les artistes et leurs concerts.
+
+Fonctionnalités:
+- Recherche d'artistes par nom
+- Affichage de la liste complète des artistes
+- Détails complets pour chaque artiste (membres, dates de création, albums)
+- Informations sur les concerts et locations
+- Relations entre dates et locations
+
+Technologies utilisées:
+- Go (Golang) pour le backend
+- HTML/CSS pour le frontend
+- API REST pour la récupération des données
+
+Développé avec passion pour les fans de musique!`
+
+	// Parsing du template
+	tmpl, err := template.ParseFiles("./template/about.html")
+	if err != nil {
+		log.Printf("Erreur lors du parsing du template: %v", err)
+		http.Error(w, "Erreur de template", http.StatusInternalServerError)
+		return
+	}
+	// Exécution du template avec les données
+	err = tmpl.Execute(w, AboutPageData{Readme: readmeContent})
+	if err != nil {
+		log.Printf("Erreur lors de l'exécution du template: %v", err)
+		http.Error(w, "Erreur d'affichage", http.StatusInternalServerError)
+		return
+	}
+	log.Println("Page servie avec succès")
+}
 func search_bar_handler(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
@@ -107,7 +148,6 @@ func search_bar_handler(w http.ResponseWriter, r *http.Request) {
 type AboutPageData struct {
 	Readme string
 }
-
 type ArtistDetailData struct {
 	Artist    api.Artist
 	Locations []string
@@ -127,28 +167,22 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "URL invalide", http.StatusBadRequest)
 		return
 	}
-
 	idStr := strings.TrimPrefix(path, "/artists/")
 	idStr = strings.TrimSuffix(idStr, "/")
 	idStr = strings.TrimSpace(idStr)
-
 	if idStr == "" {
 		log.Printf("Erreur: ID vide dans le path: %s", path)
 		http.Error(w, "ID manquant", http.StatusBadRequest)
 		return
 	}
-
 	log.Printf("ID extrait: '%s' depuis path: %s", idStr, path)
-
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		log.Printf("Erreur conversion ID: '%s' n'est pas un nombre (erreur: %v)", idStr, err)
 		http.Error(w, "ID invalide", http.StatusBadRequest)
 		return
 	}
-
 	log.Printf("ID converti avec succès: %d", id)
-
 	// Récupération de l'artiste
 	artists, err := api.GetArtists()
 	if err != nil {
@@ -156,7 +190,6 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erreur lors de la récupération des données", http.StatusInternalServerError)
 		return
 	}
-
 	var artist *api.Artist
 	for i := range artists {
 		if artists[i].ID == id {
@@ -164,13 +197,11 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-
 	if artist == nil {
 		log.Printf("Artiste non trouvé avec l'ID: %d", id)
 		http.Error(w, "Artiste non trouvé", http.StatusNotFound)
 		return
 	}
-
 	// Récupération des locations
 	locations, err := api.GetLocations()
 	if err != nil {
@@ -178,7 +209,6 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erreur lors de la récupération des données", http.StatusInternalServerError)
 		return
 	}
-
 	var artistLocations []string
 	for _, loc := range locations {
 		if loc.ID == id {
@@ -186,7 +216,6 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-
 	// Récupération des dates
 	dates, err := api.GetDates()
 	if err != nil {
@@ -202,7 +231,6 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-
 	// Récupération des relations
 	relations, err := api.GetRelations()
 	if err != nil {
@@ -210,7 +238,6 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erreur lors de la récupération des données", http.StatusInternalServerError)
 		return
 	}
-
 	var artistRelations map[string][]string
 	for _, rel := range relations {
 		if rel.ID == id {
@@ -239,6 +266,5 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erreur d'affichage", http.StatusInternalServerError)
 		return
 	}
-
 	log.Printf("Détails de l'artiste servis: %s (ID: %d)", artist.Name, id)
 }
