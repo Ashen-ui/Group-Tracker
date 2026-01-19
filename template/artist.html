@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="/static/image/logo.png">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <title>{{ .Artist.Name }} - Groupie Tracker</title>
+</head>
+<body class="page">
+    <header class="site-header">
+        <div class="header-content">
+            <div class="header-logo">
+                <img src="/static/image/logo.png" alt="Logo Groupie Tracker" class="logo">
+                <span class="logo-text">Groupie Tracker</span>
+            </div>
+            <nav class="header-nav">
+                <a href="/" class="nav-link">Accueil</a>
+                <a href="/about" class="nav-link">À propos</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <main class="content">
+            <div class="page-header">
+                <a href="/" class="back-link" style="display: inline-block; margin-bottom: 16px; color: var(--accent); text-decoration: none;">← Retour à l'accueil</a>
+                <h1>{{ .Artist.Name }}</h1>
+            </div>
+
+            <div class="artist-detail">
+                <div class="artist-detail-main">
+                    <img src="{{ .Artist.Image }}" alt="{{ .Artist.Name }}" class="artist-detail-image">
+                    <div class="artist-detail-info">
+                        <div class="info-section">
+                            <h3>Informations générales</h3>
+                            <p><strong>Année de création:</strong> {{ .Artist.CreationDate }}</p>
+                            <p><strong>Premier album:</strong> {{ .Artist.FirstAlbum }}</p>
+                        </div>
+
+                        <div class="info-section">
+                            <h3>Membres</h3>
+                            <ul class="members-list">
+                                {{ range .Artist.Members }}
+                                <li>{{ . }}</li>
+                                {{ end }}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                {{ if .Locations }}
+                <div class="info-section">
+                    <h3>Locations des concerts</h3>
+                    <ul class="locations-list">
+                        {{ range .Locations }}
+                        <li>{{ . }}</li>
+                        {{ end }}
+                    </ul>
+                </div>
+                {{ end }}
+
+                {{ if .Dates }}
+                <div class="info-section">
+                    <h3>Dates des concerts</h3>
+                    <ul class="dates-list">
+                        {{ range .Dates }}
+                        <li>{{ . }}</li>
+                        {{ end }}
+                    </ul>
+                </div>
+                {{ end }}
+
+                {{ if .Relations }}
+                <div class="info-section">
+                    <h3>Relations (Dates et Locations)</h3>
+                    <div class="relations-container">
+                        {{ range $location, $dates := .Relations }}
+                        <div class="relation-item">
+                            <h4>{{ $location }}</h4>
+                            <ul class="relation-dates">
+                                {{ range $dates }}
+                                <li>{{ . }}</li>
+                                {{ end }}
+                            </ul>
+                        </div>
+                        {{ end }}
+                    </div>
+                </div>
+                {{ end }}
+            </div>
+        </main>
+        <footer class="site-footer">
+            <p>&copy; 2025 Groupie Tracker. Tous droits réservés.</p>
+        </footer>
+    </div>
+</body>
+</html>
+
