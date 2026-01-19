@@ -24,8 +24,7 @@ urlbase := "https://groupietrackers.herokuapp.com/api"
 	//     "concertDates": "https://groupietrackers.herokuapp.com/api/dates/1",
 	//     "relations": "https://groupietrackers.herokuapp.com/api/relation/1"
 	//   },
-
-	
+		
 	// locations{
 	//   "id": 1,
 	//   "locations": [

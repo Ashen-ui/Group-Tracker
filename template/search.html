@@ -31,7 +31,33 @@
                     <button type="submit" class="search-button">Rechercher</button>
                 </form>
             </div>
-            
+            <div class="artists-section">
+                <div class="artists-stats">
+                    <span>{{ len . }} artiste{{ if ne (len .) 1 }}s{{ end }} disponible{{ if ne (len .) 1 }}s{{ end }}</span>
+                </div>
+                <div class="artists-container">
+                    {{ range . }}
+  <a class="artist-card-link" href="/artists/{{ .ID }}">
+    <div class="artist-card">
+      <img src="{{ .Image }}" alt="{{ .Name }}" class="artist-image">
+      <div class="artist-info">
+        <h2>{{ .Name }}</h2>
+        <p><strong>Année de création:</strong> {{ .CreationDate }}</p>
+        <p><strong>Premier album:</strong> {{ .FirstAlbum }}</p>
+        <div class="members-section">
+          <p><strong>Membres:</strong></p>
+          <ul>
+            {{ range .Members }}
+              <li>{{ . }}</li>
+            {{ end }}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </a>
+{{ end }}
+                </div>
+            </div>
         </main>
         <footer class="site-footer">
             <p>&copy; 2025 Groupie Tracker. Tous droits réservés.</p>

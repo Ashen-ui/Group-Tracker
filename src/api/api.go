@@ -143,6 +143,12 @@ func SearchBar(name string) (Artist, error) {
 		if artistNameLower == nameLower || strings.Contains(artistNameLower, nameLower) {
 			return artist, nil
 		}
+		for _, member := range artist.Members {
+			memberLower := strings.ToLower(member)
+			if memberLower == nameLower || strings.Contains(memberLower, nameLower) {
+				return artist, nil
+			}
+		}
 	}
 	return Artist{}, errors.New("artist not found")
 }

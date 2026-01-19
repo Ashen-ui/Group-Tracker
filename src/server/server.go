@@ -13,7 +13,7 @@ func Server() {
 	// Fichiers statiques
 	fs := http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
-	mux.HandleFunc("/search", search_bar_handler)
+	mux.HandleFunc("/search", searchHandler)
 	mux.HandleFunc("/artists/", ArtistDetailHandler)
 	mux.HandleFunc("/about", aboutHandler)
 	mux.HandleFunc("/", indexHandler)

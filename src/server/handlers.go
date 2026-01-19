@@ -14,14 +14,6 @@ import (
 var mu sync.Mutex
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	// Ne pas traiter les requêtes vers /artists/, /about ou /search
-	if strings.HasPrefix(r.URL.Path, "/artists/") || r.URL.Path == "/about" || r.URL.Path == "/search" {
-		log.Printf("indexHandler: requête ignorée: %s", r.URL.Path)
-		return
-	}
-	mu.Lock()
-	defer mu.Unlock()
-	log.Printf("indexHandler: Requête reçue: %s %s", r.Method, r.URL.Path)
 	// Récupération des artistes depuis l'API
 	artists, err := api.GetArtists()
 	if err != nil {
@@ -45,7 +37,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Page servie avec succès")
 }
-
 func aboutHandler(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
@@ -87,7 +78,7 @@ Développé avec passion pour les fans de musique!`
 	}
 	log.Println("Page servie avec succès")
 }
-func search_bar_handler(w http.ResponseWriter, r *http.Request) {
+func searchHandler(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -96,7 +87,7 @@ func search_bar_handler(w http.ResponseWriter, r *http.Request) {
 	searchName := r.URL.Query().Get("name")
 	log.Printf("Recherche de: '%s'", searchName)
 	// Parsing du template
-	tmpl, err := template.ParseFiles("./template/index.html")
+	tmpl, err := template.ParseFiles("./template/search.html")
 	if err != nil {
 		log.Printf("Erreur lors du parsing du template: %v", err)
 		http.Error(w, "Erreur de template", http.StatusInternalServerError)
