@@ -101,10 +101,10 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	// Recherche de l'artiste
-	artist, err := api.SearchBar(searchName)
+	// Recherche des artistes
+	artists, err := api.SearchBar(searchName)
 	if err != nil {
-		log.Printf("Artiste non trouvé: '%s'", searchName)
+		log.Printf("Erreur lors de la recherche: %v", err)
 		// Afficher une liste vide au lieu d'une erreur
 		artists := []api.Artist{}
 		err = tmpl.Execute(w, artists)
@@ -115,8 +115,6 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	// Convertir l'artiste unique en slice pour le template
-	artists := []api.Artist{artist}
 	// Exécution du template avec les données
 	err = tmpl.Execute(w, artists)
 	if err != nil {
@@ -125,7 +123,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Page search chargée avec succès: %s", artist.Name)
+	log.Printf("Page search chargée avec succès: %d résultats pour '%s'", len(artists), searchName)
 }
 
 type AboutPageData struct {

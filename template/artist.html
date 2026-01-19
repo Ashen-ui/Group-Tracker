@@ -24,7 +24,6 @@
     <div class="container">
         <main class="content">
             <div class="page-header">
-                <a href="/" class="back-link" style="display: inline-block; margin-bottom: 16px; color: var(--accent); text-decoration: none;">← Retour à l'accueil</a>
                 <h1>{{ .Artist.Name }}</h1>
             </div>
 
@@ -40,7 +39,7 @@
 
                         <div class="info-section">
                             <h3>Membres</h3>
-                            <ul class="members-list">
+                            <ul class="info-list">
                                 {{ range .Artist.Members }}
                                 <li>{{ . }}</li>
                                 {{ end }}
@@ -52,7 +51,7 @@
                 {{ if .Locations }}
                 <div class="info-section">
                     <h3>Locations des concerts</h3>
-                    <ul class="locations-list">
+                    <ul class="info-list">
                         {{ range .Locations }}
                         <li>{{ . }}</li>
                         {{ end }}
@@ -63,7 +62,7 @@
                 {{ if .Dates }}
                 <div class="info-section">
                     <h3>Dates des concerts</h3>
-                    <ul class="dates-list">
+                    <ul class="info-list">
                         {{ range .Dates }}
                         <li>{{ . }}</li>
                         {{ end }}

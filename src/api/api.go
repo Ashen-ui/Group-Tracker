@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 	"strings"
@@ -129,26 +128,29 @@ func GetRelations() ([]Relation, error) {
 }
 
 // Barre de recherche
-func SearchBar(name string) (Artist, error) {
+func SearchBar(name string) ([]Artist, error) {
 	artists, err := GetArtists()
 	if err != nil {
-		return Artist{}, err
+		return nil, err
 	}
 	nameLower := strings.ToLower(strings.TrimSpace(name))
 	if nameLower == "" {
-		return Artist{}, errors.New("nom de recherche vide")
+		return artists, nil // Retourner tous les artistes si vide
 	}
+	var matchingArtists []Artist
 	for _, artist := range artists {
 		artistNameLower := strings.ToLower(artist.Name)
-		if artistNameLower == nameLower || strings.Contains(artistNameLower, nameLower) {
-			return artist, nil
+		if strings.Contains(artistNameLower, nameLower) {
+			matchingArtists = append(matchingArtists, artist)
+			continue // Pour éviter de l'ajouter deux fois si membre aussi
 		}
 		for _, member := range artist.Members {
 			memberLower := strings.ToLower(member)
-			if memberLower == nameLower || strings.Contains(memberLower, nameLower) {
-				return artist, nil
+			if strings.Contains(memberLower, nameLower) {
+				matchingArtists = append(matchingArtists, artist)
+				break // Ajouter une fois par artiste
 			}
 		}
 	}
-	return Artist{}, errors.New("artist not found")
+	return matchingArtists, nil
 }
