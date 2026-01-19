@@ -8,15 +8,16 @@ import (
 
 // La fonction Server démarre le serveur web
 func Server() {
+	mux := http.NewServeMux()
+
 	// Fichiers statiques
 	fs := http.FileServer(http.Dir("./static"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
-	http.HandleFunc("/about", AboutHandler)
+	mux.Handle("/static/", http.StripPrefix("/static/", fs))
+	mux.HandleFunc("/search", search_bar_handler)
+	mux.HandleFunc("/artists/", ArtistDetailHandler)
+	mux.HandleFunc("/", indexHandler)
 
-	// Handlers
-	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/search", search_bar_handler)
 	// Démarrage du serveur
 	fmt.Println("Serveur démarré sur http://localhost:8081")
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	log.Fatal(http.ListenAndServe(":8081", mux))
 }
