@@ -7,11 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"sync"
 )
-
-// Bloque les accès concurrents à la base de données
-var mu sync.Mutex
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	// Récupération des artistes depuis l'API
@@ -35,11 +31,9 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erreur d'affichage", http.StatusInternalServerError)
 		return
 	}
-	log.Println("Page servie avec succès")
+	log.Println("Page index chargée avec succès")
 }
 func aboutHandler(w http.ResponseWriter, r *http.Request) {
-	mu.Lock()
-	defer mu.Unlock()
 	log.Printf("aboutHandler: Requête reçue: %s %s", r.Method, r.URL.Path)
 
 	// Contenu par défaut pour la page À propos
@@ -76,12 +70,9 @@ Développé avec passion pour les fans de musique!`
 		http.Error(w, "Erreur d'affichage", http.StatusInternalServerError)
 		return
 	}
-	log.Println("Page servie avec succès")
+	log.Println("Page about chargée avec succès")
 }
 func searchHandler(w http.ResponseWriter, r *http.Request) {
-	mu.Lock()
-	defer mu.Unlock()
-
 	log.Printf("Requête reçue: %s %s", r.Method, r.URL.Path)
 
 	searchName := r.URL.Query().Get("name")
@@ -133,7 +124,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Recherche servie avec succès: %s", artist.Name)
+	log.Printf("Page search chargée avec succès: %s", artist.Name)
 }
 
 type AboutPageData struct {
@@ -147,10 +138,8 @@ type ArtistDetailData struct {
 }
 
 func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
-	mu.Lock()
-	defer mu.Unlock()
 	log.Printf("=== ArtistDetailHandler appelé pour: %s ===", r.URL.Path)
-	// Extraction de l'ID depuis l'URL /artists/{id}
+	// Utilise l'ID depuis l'URL /artists/{id}
 	// Exemple: /artists/1 -> path = "1"
 	path := r.URL.Path
 	if !strings.HasPrefix(path, "/artists/") {
@@ -257,5 +246,5 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erreur d'affichage", http.StatusInternalServerError)
 		return
 	}
-	log.Printf("Détails de l'artiste servis: %s (ID: %d)", artist.Name, id)
+	log.Printf("Détails de l'artiste trouvés: %s (ID: %d)", artist.Name, id)
 }
