@@ -16,6 +16,7 @@ func Server() {
 	mux.HandleFunc("/search", searchHandler)
 	mux.HandleFunc("/artists/", ArtistDetailHandler)
 	mux.HandleFunc("/about", aboutHandler)
+	mux.HandleFunc("/api/artists", apiArtistsHandler)
 	mux.HandleFunc("/", indexHandler)
 
 	// Démarrage du serveur

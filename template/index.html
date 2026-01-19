@@ -5,8 +5,10 @@
     <link rel="icon" type="image/png" href="/static/image/logo.png">
     <link rel="stylesheet" href="/static/css/style.css">
     <title>Groupie Tracker</title>
+
 </head>
 <body class="page">
+<!-- Haut de la page "nav barre" -->
     <header class="site-header">
         <div class="header-content">
             <div class="header-logo">
@@ -20,22 +22,298 @@
             </nav>
         </div>
     </header>
-
+<!-- contenue de la page -->
     <div class="container">
         <main class="content">
-            <div class="page-header">
-                <h1>The Groupie Tracker</h1>
-                <p>Découvrez les artistes et leurs concerts</p>
-                <form method="GET" action="/search" class="search-form">
-                    <input type="text" name="name" placeholder="Rechercher un artiste..." class="search-input">
-                    <button type="submit" class="search-button">Rechercher</button>
-                </form>
+            <div class="circles-wrapper" id="circlesWrapper"></div>
+            <div class="group-info-tooltip" id="groupInfoTooltip">
+                <div class="info-content">
+                    <h3 id="infoName"></h3>
+                    <p id="infoMembers"></p>
+                    <p id="infoCreation"></p>
+                </div>
             </div>
-            
         </main>
+    </biv>
+<!-- Bas de page -->
         <footer class="site-footer">
             <p>&copy; 2025 Groupie Tracker. Tous droits réservés.</p>
         </footer>
-    </div>
-</body>
-</html>
+<!-- script -->
+    <script>
+        let groups = [];
+        let genreGroups = {};
+
+    const genreMapping = {
+        'Rock': ['Queen', 'Pink Floyd', 'Scorpions', 'ACDC', 'Pearl Jam', 'Genesis', 'Phil Collins', 'Led Zeppelin', 
+                 'The Jimi Hendrix Experience', 'Bee Gees', 'Deep Purple', 'Aerosmith', 'Dire Straits', 
+                 'The Rolling Stones', 'U2', 'Guns N\' Roses', 'Eagles', 'Linkin Park', 'Red Hot Chili Peppers', 
+                 'Green Day', 'Metallica', 'Coldplay', 'Foo Fighters', 'Arctic Monkeys', 'Fall Out Boy'],
+        'Hip-Hop/Rap': ['XXXTentacion', 'Mac Miller', 'Joyner Lucas', 'Kendrick Lamar', 'Juice Wrld', 'Logic', 
+                        'Post Malone', 'Travis Scott', 'J. Cole', 'Mobb Deep', 'NWA', 'Eminem'],
+        'Pop': ['Katy Perry', 'Rihanna', 'Thirty Seconds to Mars', 'Imagine Dragons', 'Maroon 5', 'Twenty One Pilots', 'The Chainsmokers'],
+        'Electronic/Alternative': ['SOJA', 'Gorillaz', 'R3HAB', 'Muse', 'Nickelback'],
+        'Other': []
+    };
+
+    function classifyByGenre(allGroups) {
+        const classified = {};
+        
+        Object.keys(genreMapping).forEach(genre => {
+            classified[genre] = [];
+        });
+
+        allGroups.forEach(group => {
+            let found = false;
+            for (const [genre, bands] of Object.entries(genreMapping)) {
+                if (bands.some(band => group.name.toLowerCase().includes(band.toLowerCase()))) {
+                    classified[genre].push(group);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                classified['Other'].push(group);
+            }
+        });
+
+        return classified;
+    }
+
+    async function fetchGroups() {
+        try {
+            console.log('Fetching groups from API...');
+            const response = await fetch('/api/artists');
+            console.log('Response received:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log('Data parsed, type:', typeof data, 'is array:', Array.isArray(data));
+            
+            groups = Array.isArray(data) ? data : (data.value || []);
+            console.log('Groups extracted:', groups.length);
+            
+            if (groups.length === 0) {
+                console.error('No groups received from API');
+                document.getElementById('circlesWrapper').innerHTML = '<div style="color: red; font-size: 20px; padding: 20px;">ERROR: No groups received from API</div>';
+                return;
+            }
+            
+            genreGroups = classifyByGenre(groups);
+            console.log('Genre groups classified:', genreGroups);
+            populateCircles();
+        } catch (error) {
+            console.error('Error fetching groups:', error);
+            document.getElementById('circlesWrapper').innerHTML = '<div style="color: red; font-size: 20px; padding: 20px;">ERROR: ' + error.message + '</div>';
+        }
+    }
+
+    function getCirclePosition(index, total, radius = 110) {
+        const angle = (index / total) * 360;
+        const x = Math.cos((angle - 90) * Math.PI / 180) * radius;
+        const y = Math.sin((angle - 90) * Math.PI / 180) * radius;
+        return { x, y, angle };
+    }
+
+
+    function populateCircles() {
+        const wrapper = document.getElementById('circlesWrapper');
+        console.log('Populating circles. Wrapper found:', !!wrapper);
+        wrapper.innerHTML = '';
+        
+        console.log('Genre groups keys:', Object.keys(genreGroups));
+        let totalCreated = 0;
+        Object.entries(genreGroups).forEach(([genre, groupList]) => {
+            console.log(`${genre}: ${groupList.length} groups`);
+            if (groupList.length > 0) {
+                const circleElement = createGenreCircle(genre, groupList);
+                wrapper.appendChild(circleElement);
+                totalCreated++;
+            }
+        });
+        console.log('Total circles created:', totalCreated);
+    }
+    
+    function handleHover(group, element, circle, pos) {
+        if (!element.matches(':hover')) return;
+        const angle = Math.atan2(pos.y, pos.x);
+        const pullDistance = 60;
+        const pullX = Math.cos(angle) * pullDistance;
+        const pullY = Math.sin(angle) * pullDistance;
+        
+        const newX = 160 + pos.x + pullX;
+        const newY = 160 + pos.y + pullY;
+        
+        element.style.left = newX + 'px';
+        element.style.top = newY + 'px';
+        element.style.transform = 'scale(1.2)';
+        element.style.zIndex = '100';
+        element.style.boxShadow = '0 0 30px #5eead4';
+        
+        let tooltip = document.querySelector(`#tooltip-${group.id}`);
+        if (tooltip) tooltip.remove();
+        
+        tooltip = document.createElement('div');
+        tooltip.id = `tooltip-${group.id}`;
+        tooltip.style.cssText = `
+            position: fixed;
+            background: rgba(11, 18, 32, 0.95);
+            border: 2px solid #5eead4;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            color: #e5e7eb;
+            z-index: 101;
+            pointer-events: none;
+            box-shadow: 0 0 20px rgba(94, 234, 212, 0.3);
+        `;
+        
+        const rect = element.getBoundingClientRect();
+        tooltip.style.left = (rect.left + rect.width / 2) + 'px';
+        tooltip.style.top = (rect.top - 50) + 'px';
+        tooltip.style.transform = 'translateX(-50%)';
+        
+        const memberCount = group.members ? group.members.length : 0;
+        tooltip.innerHTML = `<strong>${group.name}</strong><br>Members: ${memberCount} | Year: ${group.creationDate}`;
+        
+        document.body.appendChild(tooltip);
+    }
+
+    function createGenreCircle(genre, groupList) {
+        const container = document.createElement('div');
+        container.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            margin-bottom: 140px; /* extra space so circles don't overlap following content */
+        `;
+
+        const title = document.createElement('h2');
+        title.textContent = genre;
+        title.style.cssText = `
+            font-size: 1.8rem;
+            color: #5eead4;
+            text-align: center;
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: 1px;
+            width: 100%;
+        `;
+        container.appendChild(title);
+        const circleWrapper = document.createElement('div');
+        const isRock = genre === 'Rock';
+        if (isRock) {
+            title.style.transform = 'translateY(-8px)';
+        } else {
+            title.style.transform = 'translateY(120px)';
+        }
+
+        const circleTop = 100; 
+        const circleLeft = -60; 
+
+        circleWrapper.style.cssText = `
+            position: relative;
+            width: 320px;
+            height: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: ${circleLeft}px;
+            margin-top: ${circleTop}px;
+        `;
+
+        const circle = document.createElement('div');
+        circle.className = 'rotating-circle';
+        circle.dataset.genre = genre;
+        circle.style.cssText = `
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+        `;
+
+        const radius = (genre === 'Rock')
+            ? Math.max(130, 110 + groupList.length * 6)
+            : Math.max(110, 110 + groupList.length * 3);
+        groupList.forEach((group, index) => {
+            const pos = getCirclePosition(index, groupList.length, radius);
+            const div = document.createElement('div');
+            div.className = 'group-item';
+            div.dataset.id = group.id;
+            div.dataset.index = index;
+            div.dataset.angle = pos.angle;
+            div.dataset.originalX = 160 + pos.x;
+            div.dataset.originalY = 160 + pos.y;
+
+            div.style.cssText = `
+                position: absolute;
+                width: 70px;
+                height: 70px;
+                border-radius: 50%;
+                overflow: hidden;
+                cursor: pointer;
+                background: #5eead4;
+                border: 2px solid #0b1220;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                left: ${160 + pos.x}px;
+                top: ${160 + pos.y}px;
+                transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            `;
+
+            const img = document.createElement('img');
+            img.src = group.image;
+            img.alt = group.name;
+            img.style.cssText = `
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            `;
+
+            div.appendChild(img);
+
+            div.addEventListener('mouseenter', () => {
+                setTimeout(() => handleHover(group, div, circle, pos), 100);
+            });
+            div.addEventListener('mouseleave', () => handleHoverEnd(div, circle, pos));
+
+            div.addEventListener('click', () => redirectToGroup(group.id));
+
+            circle.appendChild(div);
+        });
+
+        circleWrapper.appendChild(circle);
+        container.appendChild(circleWrapper);
+
+        return container;
+    }
+
+        function handleHoverEnd(element, circle, pos) {
+            element.style.transform = '';
+            element.style.zIndex = '';
+            element.style.boxShadow = '';
+            const origX = element.dataset.originalX ? Number(element.dataset.originalX) : (160 + pos.x);
+            const origY = element.dataset.originalY ? Number(element.dataset.originalY) : (160 + pos.y);
+            element.style.left = origX + 'px';
+            element.style.top = origY + 'px';
+
+            const tooltip = document.querySelector(`#tooltip-${element.dataset.id}`);
+            if (tooltip) tooltip.remove();
+        }
+
+        function redirectToGroup(id) {
+            if (!id) return;
+            window.location.href = '/artists/' + id;
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchGroups();
+        });
+        </script>
+    </body>
+    </html>
