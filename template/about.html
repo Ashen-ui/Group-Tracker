@@ -11,8 +11,12 @@
         <div class="header-content">
             <div class="header-logo">
                 <img src="/static/image/logo.png" alt="Logo Groupie Tracker" class="logo">
-                <span class="logo-text">Groupie Tracker</span>
-            </div>
+                <a href="/"  class="nav-link">Groupie Tracker</a>
+            </div >
+            <form method="GET" action="/search" class="search-form" style= "margin:0; ">
+                <input type="text" name="name" placeholder="Rechercher un artiste..." class="search-input">
+                <button type="submit" class="search-button">Rechercher</button>
+            </form>
             <nav class="header-nav">
                 <a href="/" class="nav-link">Accueil</a>
                 <a href="/search" class="nav-link">Recherche</a>
