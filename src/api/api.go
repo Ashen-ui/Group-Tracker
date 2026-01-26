@@ -127,30 +127,138 @@ func GetRelations() ([]Relation, error) {
 	return result.Index, nil
 }
 
-// Barre de recherche
+// SearchBar
 func SearchBar(name string) ([]Artist, error) {
 	artists, err := GetArtists()
 	if err != nil {
 		return nil, err
 	}
-	nameLower := strings.ToLower(strings.TrimSpace(name))
-	if nameLower == "" {
-		return artists, nil // Retourner tous les artistes si vide
+	lowCaseName := strings.ToLower(strings.TrimSpace(name))
+	if lowCaseName == "" {
+		return artists, nil //return all artists if empty
 	}
 	var matchingArtists []Artist
 	for _, artist := range artists {
-		artistNameLower := strings.ToLower(artist.Name)
-		if strings.Contains(artistNameLower, nameLower) {
+		artistlowCaseName := strings.ToLower(artist.Name)
+		if strings.Contains(artistlowCaseName, lowCaseName) {
 			matchingArtists = append(matchingArtists, artist)
-			continue // Pour éviter de l'ajouter deux fois si membre aussi
+			continue //To avoid adding twice if already member
 		}
 		for _, member := range artist.Members {
 			memberLower := strings.ToLower(member)
-			if strings.Contains(memberLower, nameLower) {
+			if strings.Contains(memberLower, lowCaseName) {
 				matchingArtists = append(matchingArtists, artist)
-				break // Ajouter une fois par artiste
+				break //Add once per artist
 			}
 		}
 	}
 	return matchingArtists, nil
+}
+
+var genreMapping = map[string][]string{
+	"Rock": {
+		"Queen", "Pink Floyd", "Scorpions", "ACDC", "Pearl Jam", "Genesis", "Phil Collins", "Led Zeppelin",
+		"The Jimi Hendrix Experience", "Bee Gees", "Deep Purple", "Aerosmith", "Dire Straits",
+		"The Rolling Stones", "U2", "Guns N' Roses", "Eagles", "Linkin Park", "Red Hot Chili Peppers",
+		"Green Day", "Metallica", "Coldplay", "Foo Fighters", "Arctic Monkeys", "Fall Out Boy",
+	},
+	"Hip-Hop/Rap": {
+		"XXXTentacion", "Mac Miller", "Joyner Lucas", "Kendrick Lamar", "Juice Wrld", "Logic",
+		"Post Malone", "Travis Scott", "J. Cole", "Mobb Deep", "NWA", "Eminem",
+	},
+	"Pop": {
+		"Katy Perry", "Rihanna", "Thirty Seconds to Mars", "Imagine Dragons", "Maroon 5",
+		"Twenty One Pilots", "The Chainsmokers",
+	},
+	"Electronic/Alternative": {
+		"SOJA", "Gorillaz", "R3HAB", "Muse", "Nickelback",
+	},
+}
+
+func ArtistGenreSearch(artistName string) string {
+	lowCaseName := strings.ToLower(artistName)
+	for genre, bands := range genreMapping {
+		for _, band := range bands {
+			if strings.Contains(lowCaseName, strings.ToLower(band)) {
+				return genre
+			}
+		}
+	}
+	return "Other"
+}
+
+func FilterSearch(name, genre, artistType, location string) ([]Artist, error) {
+	artists, err := GetArtists()
+	if err != nil {
+		return nil, err
+	}
+
+	locations, err := GetLocations()
+	if err != nil {
+		return nil, err
+	}
+
+	lowCaseName := strings.ToLower(strings.TrimSpace(name))
+	lowCaseLocation := strings.ToLower(strings.TrimSpace(location))
+	genre = strings.TrimSpace(genre)
+
+	var results []Artist
+
+	for _, i := range artists {
+		if lowCaseName != "" {
+			matched := false
+			if strings.Contains(strings.ToLower(i.Name), lowCaseName) {
+				matched = true
+			} else {
+				for _, j := range i.Members {
+					if strings.Contains(strings.ToLower(j), lowCaseName) {
+						matched = true
+						break
+					}
+				}
+			}
+			if !matched {
+				continue
+			}
+		}
+
+		//Genre
+		if genre != "" {
+			if ArtistGenreSearch(i.Name) != genre {
+				continue
+			}
+		}
+
+		//Type
+		if artistType == "solo" && len(i.Members) != 1 {
+			continue
+		}
+		if artistType == "group" && len(i.Members) == 1 {
+			continue
+		}
+
+		//Location
+		if lowCaseLocation != "" {
+			found := false
+			for _, loc := range locations {
+				if loc.ID != i.ID {
+					continue
+				}
+				for _, l := range loc.Locations {
+					if strings.Contains(strings.ToLower(l), lowCaseLocation) {
+						found = true
+						break
+					}
+				}
+				break
+			}
+			if !found {
+				continue
+			}
+		}
+
+		results = append(results, i)
+	}
+
+	return results, nil
 }

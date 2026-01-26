@@ -14,122 +14,114 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	// Récupération des artistes depuis l'API
 	artists, err := api.GetArtists()
 	if err != nil {
-		log.Printf("Erreur lors de la récupération des artistes: %v", err)
-		http.Error(w, "Erreur lors de la récupération des données", http.StatusInternalServerError)
+		log.Printf("Error while getting artists: %v", err)
+		http.Error(w, "Error while getting data", http.StatusInternalServerError)
 		return
 	}
 	// Parsing du template
 	tmpl, err := template.ParseFiles("./template/index.html")
 	if err != nil {
-		log.Printf("Erreur lors du parsing du template: %v", err)
-		http.Error(w, "Erreur de template", http.StatusInternalServerError)
+		log.Printf("Error while parsing template: %v", err)
+		http.Error(w, "Template Error", http.StatusInternalServerError)
 		return
 	}
 	// Exécution du template avec les données
 	err = tmpl.Execute(w, artists)
 	if err != nil {
-		log.Printf("Erreur lors de l'exécution du template: %v", err)
-		http.Error(w, "Erreur d'affichage", http.StatusInternalServerError)
+		log.Printf("Error while executing template: %v", err)
+		http.Error(w, "Display error", http.StatusInternalServerError)
 		return
 	}
-	log.Println("Page index chargée avec succès")
+	log.Println("Index page succesfully loaded")
 }
 func aboutHandler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("aboutHandler: Requête reçue: %s %s", r.Method, r.URL.Path)
+	log.Printf("aboutHandler: request received: %s %s", r.Method, r.URL.Path)
 
 	// Contenu par défaut pour la page À propos
-	readmeContent := `Groupie Tracker
+	readmeContent := `Group Tracker
 
-Bienvenue sur Groupie Tracker, une application web permettant de découvrir 
-les artistes et leurs concerts.
+Welcome to the group tracker, a web app that lets you discover 
+different artists and their concerts
 
-Fonctionnalités:
-- Recherche d'artistes par nom
-- Affichage de la liste complète des artistes
-- Détails complets pour chaque artiste (membres, dates de création, albums)
-- Informations sur les concerts et locations
-- Relations entre dates et locations
+Functionalities:
+- Search by name
+- Complete artist list display
+- Full details about artists (members, creation dates, albums)
+- Concert and location information
+- Date and location relations
 
-Technologies utilisées:
-- Go (Golang) pour le backend
-- HTML/CSS pour le frontend
-- API REST pour la récupération des données
+Used Tech:
+- Go (Golang) for the backend
+- HTML/CSS for the frontend
+- API REST to get the data
 
-Développé avec passion pour les fans de musique!`
+Developed with the passion for music!`
 
-	// Parsing du template
+	//Template parsing
 	tmpl, err := template.ParseFiles("./template/about.html")
 	if err != nil {
-		log.Printf("Erreur lors du parsing du template: %v", err)
-		http.Error(w, "Erreur de template", http.StatusInternalServerError)
+		log.Printf("Error while parsing template: %v", err)
+		http.Error(w, "Template error", http.StatusInternalServerError)
 		return
 	}
-	// Exécution du template avec les données
+	//Template execution with data
 	err = tmpl.Execute(w, AboutPageData{Readme: readmeContent})
 	if err != nil {
-		log.Printf("Erreur lors de l'exécution du template: %v", err)
-		http.Error(w, "Erreur d'affichage", http.StatusInternalServerError)
+		log.Printf("Template execution error: %v", err)
+		http.Error(w, "Display Error", http.StatusInternalServerError)
 		return
 	}
-	log.Println("Page about chargée avec succès")
+	log.Println("Page was successfuly loaded")
 }
-func searchHandler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Requête reçue: %s %s", r.Method, r.URL.Path)
 
-	searchName := r.URL.Query().Get("name")
-	log.Printf("Recherche de: '%s'", searchName)
-	// Parsing du template
+type SearchQuery struct {
+	Name, Genre, Type, Location string
+}
+type PageData struct {
+	Artists []api.Artist
+	Query   SearchQuery
+}
+
+func searchHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("request received: %s %s", r.Method, r.URL.Path)
+
+	query := SearchQuery{
+		Name:     r.URL.Query().Get("name"),
+		Genre:    r.URL.Query().Get("genre"),
+		Type:     r.URL.Query().Get("type"),
+		Location: r.URL.Query().Get("location"),
+	}
+
+	log.Printf("Search: name='%s' genre='%s' type='%s' location='%s'", query.Name, query.Genre, query.Type, query.Location)
+
+	//Template parsing
 	tmpl, err := template.ParseFiles("./template/search.html")
 	if err != nil {
-		log.Printf("Erreur lors du parsing du template: %v", err)
-		http.Error(w, "Erreur de template", http.StatusInternalServerError)
-		return
-	}
-	// Si aucun nom n'est fourni, afficher tous les artistes
-	if searchName == "" {
-		artists, err := api.GetArtists()
-		if err != nil {
-			log.Printf("Erreur lors de la récupération des artistes: %v", err)
-			http.Error(w, "Erreur lors de la récupération des données", http.StatusInternalServerError)
-			return
-		}
-		err = tmpl.Execute(w, artists)
-		if err != nil {
-			log.Printf("Erreur lors de l'exécution du template: %v", err)
-			http.Error(w, "Erreur d'affichage", http.StatusInternalServerError)
-			return
-		}
-		return
-	}
-	// Recherche des artistes
-	artists, err := api.SearchBar(searchName)
-	if err != nil {
-		log.Printf("Erreur lors de la recherche: %v", err)
-		// Afficher une liste vide au lieu d'une erreur
-		artists := []api.Artist{}
-		err = tmpl.Execute(w, artists)
-		if err != nil {
-			log.Printf("Erreur lors de l'exécution du template: %v", err)
-			http.Error(w, "Erreur d'affichage", http.StatusInternalServerError)
-			return
-		}
-		return
-	}
-	// Exécution du template avec les données
-	err = tmpl.Execute(w, artists)
-	if err != nil {
-		log.Printf("Erreur lors de l'exécution du template: %v", err)
-		http.Error(w, "Erreur d'affichage", http.StatusInternalServerError)
+		log.Printf("Error while parsing template: %v", err)
+		http.Error(w, "Template error", http.StatusInternalServerError)
 		return
 	}
 
-	log.Printf("Page search chargée avec succès: %d résultats pour '%s'", len(artists), searchName)
+	artists, err := api.FilterSearch(query.Name, query.Genre, query.Type, query.Location)
+	if err != nil {
+		log.Printf("Error while searching: %v", err)
+		artists = []api.Artist{}
+	}
+
+	err = tmpl.Execute(w, PageData{Artists: artists, Query: query})
+	if err != nil {
+		log.Printf("Error while executing the template: %v", err)
+		http.Error(w, "Display Error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Page was successfuly loaded: %d results", len(artists))
 }
 
 type AboutPageData struct {
 	Readme string
 }
-type ArtistDetailData struct {
+type ArtistData struct {
 	Artist    api.Artist
 	Locations []string
 	Dates     []string
@@ -137,36 +129,36 @@ type ArtistDetailData struct {
 }
 
 func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("=== ArtistDetailHandler appelé pour: %s ===", r.URL.Path)
-	// Utilise l'ID depuis l'URL /artists/{id}
-	// Exemple: /artists/1 -> path = "1"
+	log.Printf("=== ArtistDetailHandler called for: %s ===", r.URL.Path)
+	//Uses ID from URL /artists/{id}
+	//Example: /artists/1 -> path = "1"
 	path := r.URL.Path
 	if !strings.HasPrefix(path, "/artists/") {
-		log.Printf("Erreur: le path ne commence pas par /artists/: %s", path)
-		http.Error(w, "URL invalide", http.StatusBadRequest)
+		log.Printf("Error: path doesn't start with /artists/: %s", path)
+		http.Error(w, "Invalid URL", http.StatusBadRequest)
 		return
 	}
 	idStr := strings.TrimPrefix(path, "/artists/")
 	idStr = strings.TrimSuffix(idStr, "/")
 	idStr = strings.TrimSpace(idStr)
 	if idStr == "" {
-		log.Printf("Erreur: ID vide dans le path: %s", path)
-		http.Error(w, "ID manquant", http.StatusBadRequest)
+		log.Printf("Error: empty ID in the path %s", path)
+		http.Error(w, "ID missing", http.StatusBadRequest)
 		return
 	}
-	log.Printf("ID extrait: '%s' depuis path: %s", idStr, path)
+	log.Printf("ID extract: '%s' from path: %s", idStr, path)
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		log.Printf("Erreur conversion ID: '%s' n'est pas un nombre (erreur: %v)", idStr, err)
-		http.Error(w, "ID invalide", http.StatusBadRequest)
+		log.Printf("Error converting ID: '%s' isn't a number (erreur: %v)", idStr, err)
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
 	}
-	log.Printf("ID converti avec succès: %d", id)
-	// Récupération de l'artiste
+	log.Printf("ID successfuly converted: %d", id)
+	//Getting artist
 	artists, err := api.GetArtists()
 	if err != nil {
-		log.Printf("Erreur lors de la récupération des artistes: %v", err)
-		http.Error(w, "Erreur lors de la récupération des données", http.StatusInternalServerError)
+		log.Printf("Error while getting artists: %v", err)
+		http.Error(w, "Error while getting data", http.StatusInternalServerError)
 		return
 	}
 	var artist *api.Artist
@@ -177,15 +169,15 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if artist == nil {
-		log.Printf("Artiste non trouvé avec l'ID: %d", id)
-		http.Error(w, "Artiste non trouvé", http.StatusNotFound)
+		log.Printf("Artist not found with ID: %d", id)
+		http.Error(w, "Artist not found", http.StatusNotFound)
 		return
 	}
-	// Récupération des locations
+	//Getting locations
 	locations, err := api.GetLocations()
 	if err != nil {
-		log.Printf("Erreur lors de la récupération des locations: %v", err)
-		http.Error(w, "Erreur lors de la récupération des données", http.StatusInternalServerError)
+		log.Printf("Error while getting locations: %v", err)
+		http.Error(w, "Error while getting data", http.StatusInternalServerError)
 		return
 	}
 	var artistLocations []string
@@ -195,11 +187,11 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-	// Récupération des dates
+	//Getting dates
 	dates, err := api.GetDates()
 	if err != nil {
-		log.Printf("Erreur lors de la récupération des dates: %v", err)
-		http.Error(w, "Erreur lors de la récupération des données", http.StatusInternalServerError)
+		log.Printf("Error while getting dates: %v", err)
+		http.Error(w, "Error while getting data", http.StatusInternalServerError)
 		return
 	}
 
@@ -210,11 +202,11 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-	// Récupération des relations
+	//Get the relations
 	relations, err := api.GetRelations()
 	if err != nil {
-		log.Printf("Erreur lors de la récupération des relations: %v", err)
-		http.Error(w, "Erreur lors de la récupération des données", http.StatusInternalServerError)
+		log.Printf("Error while getting relations: %v", err)
+		http.Error(w, "Error while getting data", http.StatusInternalServerError)
 		return
 	}
 	var artistRelations map[string][]string
@@ -224,57 +216,57 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-	// Préparation des données pour le template
-	data := ArtistDetailData{
+	//Preparing data for the template
+	data := ArtistData{
 		Artist:    *artist,
 		Locations: artistLocations,
 		Dates:     artistDates,
 		Relations: artistRelations,
 	}
-	// Parsing du template
+	//Parsing the template
 	tmpl, err := template.ParseFiles("./template/artist.html")
 	if err != nil {
-		log.Printf("Erreur lors du parsing du template: %v", err)
-		http.Error(w, "Erreur de template", http.StatusInternalServerError)
+		log.Printf("Error while parsing template: %v", err)
+		http.Error(w, "Template error", http.StatusInternalServerError)
 		return
 	}
-	// Exécution du template avec les données
+	//Template execution with data
 	err = tmpl.Execute(w, data)
 	if err != nil {
-		log.Printf("Erreur lors de l'exécution du template: %v", err)
-		http.Error(w, "Erreur d'affichage", http.StatusInternalServerError)
+		log.Printf("Error while executing template: %v", err)
+		http.Error(w, "Display error", http.StatusInternalServerError)
 		return
 	}
-	log.Printf("Détails de l'artiste trouvés: %s (ID: %d)", artist.Name, id)
+	log.Printf("Artist details found: %s (ID: %d)", artist.Name, id)
 }
 
 func apiArtistsHandler(w http.ResponseWriter, r *http.Request) {
-	// Set CORS headers
+	//Set headers
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
-	// Handle preflight
+	//Header check
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
 
-	// Fetch from external API
+	//Get from external API
 	resp, err := http.Get("https://groupietrackers.herokuapp.com/api/artists")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error":"Failed to fetch from external API"}`))
+		w.Write([]byte(`{"Error: failed to fetch from API"}`))
 		return
 	}
 	defer resp.Body.Close()
 
-	// Copy response to client
+	//Post to client
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error":"Failed to read response"}`))
+		w.Write([]byte(`{"Error: failed to read response"}`))
 		return
 	}
 

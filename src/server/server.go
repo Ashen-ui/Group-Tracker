@@ -6,11 +6,11 @@ import (
 	"net/http"
 )
 
-// La fonction Server démarre le serveur web
+// The server function starts on the web server
 func Server() {
 	mux := http.NewServeMux()
 
-	// Fichiers statiques
+	//Static files
 	fs := http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
 	mux.HandleFunc("/search", searchHandler)
@@ -19,7 +19,7 @@ func Server() {
 	mux.HandleFunc("/api/artists", apiArtistsHandler)
 	mux.HandleFunc("/", indexHandler)
 
-	// Démarrage du serveur
+	//Starting the server
 	fmt.Println("Serveur démarré sur http://localhost:8081")
 	log.Fatal(http.ListenAndServe(":8081", mux))
 }

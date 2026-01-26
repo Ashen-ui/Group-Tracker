@@ -4,23 +4,23 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="/static/image/logo.png">
     <link rel="stylesheet" href="/static/css/style.css">
-    <title>Groupie Tracker</title>
+    <title>Group Tracker</title>
 </head>
 <body class="page">
     <header class="site-header">
         <div class="header-content">
             <div class="header-logo">
                 <img src="/static/image/logo.png" alt="Logo Groupie Tracker" class="logo">
-                <a href="/"  class="nav-link">Groupie Tracker</a>
-            </div >
-            <form method="GET" action="/search" class="search-form" style= "margin:0; ">
-                <input type="text" name="name" placeholder="Rechercher un artiste..." class="search-input">
-                <button type="submit" class="search-button">Rechercher</button>
+                <a href="/"  class="nav-link">Group Tracker</a>
+            </div>
+            <form method="GET" action="/search" class="search-form" style= "margin:0;">
+                <input type="text" name="name" placeholder="Search: Name,Genre,Location,Type(solo/group)" class="search-input" value="{{ .Query.Name }}">
+                <button type="submit" class="search-button">Search</button>
             </form>
             <nav class="header-nav">
-                <a href="/" class="nav-link">Accueil</a>
-                <a href="/search" class="nav-link">Recherche</a>
-                <a href="/about" class="nav-link">À propos</a>
+                <a href="/" class="nav-link">Home</a>
+                <a href="/search" class="nav-link">Search</a>
+                <a href="/about" class="nav-link">About</a>
             </nav>
         </div>
     </header>
@@ -28,39 +28,78 @@
     <div class="container">
         <main class="content">
             <div class="page-header">
-                <h1>The Groupie Tracker</h1>
-                <p>Découvrez les artistes et leurs concerts</p>
+                <h1>The Group Tracker</h1>
+                <p>Discover artists and their concerts</p>
             </div>
+            <form method="GET" action="/search" class="filters">
+                <div class="filters-row">
+                    <label>
+                        Name
+                        <input type="text" name="name" value="{{ .Query.Name }}">
+                    </label>
+
+                    <label>
+                        Genre
+                        <select name="genre">
+                        <option value="">All</option>
+                        <option value="Rock" {{ if eq .Query.Genre "Rock" }}selected{{ end }}>Rock</option>
+                        <option value="Hip-Hop/Rap" {{ if eq .Query.Genre "Hip-Hop/Rap" }}selected{{ end }}>Hip-Hop/Rap</option>
+                        <option value="Pop" {{ if eq .Query.Genre "Pop" }}selected{{ end }}>Pop</option>
+                        <option value="Electronic/Alternative" {{ if eq .Query.Genre "Electronic/Alternative" }}selected{{ end }}>Electronic/Alternative</option>
+                        <option value="Other" {{ if eq .Query.Genre "Other" }}selected{{ end }}>Other</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        Type
+                        <select name="type">
+                        <option value="">All</option>
+                        <option value="solo" {{ if eq .Query.Type "solo" }}selected{{ end }}>Solo</option>
+                        <option value="group" {{ if eq .Query.Type "group" }}selected{{ end }}>Group</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        Location
+                        <input type="text" name="location" value="{{ .Query.Location }}">
+                    </label>
+
+                    <div class="filters-actions">
+                        <button type="submit" class="button">Search</button>
+                        <a href="/search" class="link">Clear</a>
+                    </div>
+                </div>
+            </form>
             <div class="artists-section">
                 <div class="artists-stats">
-                    <span>{{ len . }}/52 artiste{{ if ne (len .) 1 }}s{{ end }} disponible{{ if ne (len .) 1 }}s{{ end }}</span>
+                    <span>{{ len .Artists }}/52 artiste{{ if ne (len .Artists) 1 }}s{{ end }} disponible{{ if ne (len .Artists) 1 }}s{{ end }}</span>
                 </div>
                 <div class="artists-container">
-                    {{ range . }}
-  <a class="artist-card-link" href="/artists/{{ .ID }}">
-    <div class="artist-card">
-      <img src="{{ .Image }}" alt="{{ .Name }}" class="artist-image">
-      <div class="artist-info">
-        <h2>{{ .Name }}</h2>
-        <p><strong>Année de création:</strong> {{ .CreationDate }}</p>
-        <p><strong>Premier album:</strong> {{ .FirstAlbum }}</p>
-        <div class="members-section">
-          <p><strong>Membres:</strong></p>
-          <ul>
-            {{ range .Members }}
-              <li>{{ . }}</li>
-            {{ end }}
-          </ul>
-        </div>
-      </div>
-    </div>
-  </a>
-{{ end }}
+                    {{ range .Artists }}
+                    <a class="artist-card-link" href="/artists/{{ .ID }}">
+                        <div class="artist-card">
+                            <img src="{{ .Image }}" alt="{{ .Name }}" class="artist-image">
+                            <div class="artist-info">
+                                <h2>{{ .Name }}</h2>
+                                <p><strong>Creation Year:</strong> {{ .CreationDate }}</p>
+                                <p><strong>First Album:</strong> {{ .FirstAlbum }}</p>
+                                <div class="members-section">
+                                    <p><strong>Members:</strong></p>
+                                    <ul>
+                                        {{ range .Members }}
+                                        <li>{{ . }}</li>
+                                        {{ end }}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {{ end }}
                 </div>
             </div>
         </main>
         <footer class="site-footer">
-            <p>&copy; 2025 Groupie Tracker. Tous droits réservés.</p>
+            <p>&copy; 2025 Groupie Tracker. All rights reserved.</p>
         </footer>
     </div>
 </body>

@@ -4,23 +4,23 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="/static/image/logo.png">
     <link rel="stylesheet" href="/static/css/style.css">
-    <title>{{ .Artist.Name }} - Groupie Tracker</title>
+    <title>{{ .Artist.Name }} - Group Tracker</title>
 </head>
 <body class="page">
     <header class="site-header">
         <div class="header-content">
             <div class="header-logo">
-                <img src="/static/image/logo.png" alt="Logo Groupie Tracker" class="logo">
-                <a href="/"  class="nav-link">Groupie Tracker</a>
+                <img src="/static/image/logo.png" alt="Logo Group Tracker" class="logo">
+                <a href="/"  class="nav-link">Group Tracker</a>
             </div >
             <form method="GET" action="/search" class="search-form" style= "margin:0; ">
-                <input type="text" name="name" placeholder="Rechercher un artiste..." class="search-input">
-                <button type="submit" class="search-button">Rechercher</button>
+                <input type="text" name="name" placeholder="Search: Name,Genre,Location,Type(solo/group)" class="search-input">
+                <button type="submit" class="search-button">Search</button>
             </form>
             <nav class="header-nav">
-                <a href="/" class="nav-link">Accueil</a>
-                <a href="/search" class="nav-link">Recherche</a>
-                <a href="/about" class="nav-link">À propos</a>
+                <a href="/" class="nav-link">Home</a>
+                <a href="/search" class="nav-link">Search</a>
+                <a href="/about" class="nav-link">About</a>
             </nav>
         </div>
     </header>
@@ -36,13 +36,13 @@
                     <img src="{{ .Artist.Image }}" alt="{{ .Artist.Name }}" class="artist-detail-image">
                     <div class="artist-detail-info">
                         <div class="info-section">
-                            <h3>Informations générales</h3>
-                            <p><strong>Année de création:</strong> {{ .Artist.CreationDate }}</p>
-                            <p><strong>Premier album:</strong> {{ .Artist.FirstAlbum }}</p>
+                            <h3>General Information</h3>
+                            <p><strong>Creation Year:</strong> {{ .Artist.CreationDate }}</p>
+                            <p><strong>First Album:</strong> {{ .Artist.FirstAlbum }}</p>
                         </div>
 
                         <div class="info-section">
-                            <h3>Membres</h3>
+                            <h3>Members</h3>
                             <ul class="info-list">
                                 {{ range .Artist.Members }}
                                 <li>{{ . }}</li>
@@ -54,7 +54,7 @@
 
                 {{ if .Locations }}
                 <div class="info-section">
-                    <h3>Locations des concerts</h3>
+                    <h3>Concert Locations</h3>
                     <ul class="info-list">
                         {{ range .Locations }}
                         <li>{{ . }}</li>
@@ -65,7 +65,7 @@
 
                 {{ if .Dates }}
                 <div class="info-section">
-                    <h3>Dates des concerts</h3>
+                    <h3>Concert Dates</h3>
                     <ul class="info-list">
                         {{ range .Dates }}
                         <li>{{ . }}</li>
@@ -76,7 +76,7 @@
 
                 {{ if .Relations }}
                 <div class="info-section">
-                    <h3>Relations (Dates et Locations)</h3>
+                    <h3>Relations (Dates and Locations)</h3>
                     <div class="relations-container">
                         {{ range $location, $dates := .Relations }}
                         <div class="relation-item">
@@ -94,7 +94,7 @@
             </div>
         </main>
         <footer class="site-footer">
-            <p>&copy; 2025 Groupie Tracker. Tous droits réservés.</p>
+            <p>&copy; 2025 Group Tracker. All rights reserved.</p>
         </footer>
     </div>
 </body>

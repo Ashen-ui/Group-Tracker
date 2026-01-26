@@ -329,3 +329,69 @@ body {
 .back-link:hover {
     text-decoration: underline;
 }
+
+.filters {
+  margin: 16px 0;
+  padding: 12px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.filters-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.filters label {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.filters input,
+.filters select {
+  padding: 8px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  background: rgba(0,0,0,0.15);
+  color: inherit;
+  border-radius: 4px;
+  outline: none;
+}
+
+.filters input:focus,
+.filters select:focus {
+  border-color: rgba(8, 0, 0, 0.35);
+}
+
+.filters-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn {
+  padding: 8px 12px;
+  border: 1px solid rgba(0, 0, 0, 0);
+  background: rgba(0, 0, 0, 0.06);
+  color: inherit;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.link {
+  color: inherit;
+  opacity: 0.85;
+  text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  .filters-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
