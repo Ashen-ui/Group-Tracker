@@ -128,6 +128,29 @@ type ArtistData struct {
 	Relations map[string][]string
 }
 
+func formatLocation(location string) string {
+	//UNderscores -> Spaces
+	location = strings.ReplaceAll(location, "_", " ")
+
+	//Split if hyphen ex : city-country <- hypen = true = split
+	parts := strings.Split(location, "-")
+	if len(parts) < 2 {
+		//if legit no hyphen found(ci-ty <- stupid example) then just making it Capital (strings.Title() is deprecated :d)
+		return strings.Title(location)
+	}
+
+	//This makes it so that the country is at the end of the line
+	city := strings.Join(parts[:len(parts)-1], "-")
+	country := parts[len(parts)-1]
+
+	//Uppers basically both words(and ofc strings.Title() is deprecated T_T)
+	city = strings.Title(city)
+	country = strings.Title(country)
+
+	//format would be city + country
+	return city + ", " + country
+}
+
 func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("=== ArtistDetailHandler called for: %s ===", r.URL.Path)
 	//Uses ID from URL /artists/{id}
@@ -183,7 +206,9 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 	var artistLocations []string
 	for _, loc := range locations {
 		if loc.ID == id {
-			artistLocations = loc.Locations
+			for _, location := range loc.Locations {
+				artistLocations = append(artistLocations, formatLocation(location))
+			}
 			break
 		}
 	}
@@ -212,7 +237,11 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 	var artistRelations map[string][]string
 	for _, rel := range relations {
 		if rel.ID == id {
-			artistRelations = rel.DatesLocations
+			artistRelations = make(map[string][]string)
+			for location, dates := range rel.DatesLocations {
+				formattedLocation := formatLocation(location)
+				artistRelations[formattedLocation] = dates
+			}
 			break
 		}
 	}
