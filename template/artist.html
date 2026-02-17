@@ -2,29 +2,37 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <!--Basically using leaflet library for map handling-->    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
     <link rel="icon" type="image/png" href="/static/image/logo.png">
     <link rel="stylesheet" href="/static/css/style.css">
-    <title>{{ .Artist.Name }} - Groupie Tracker</title>
+    <title>{{ .Artist.Name }} - Group Tracker</title>
 </head>
 <body class="page">
+<!-- Page top "navigation bar" -->
     <header class="site-header">
         <div class="header-content">
             <div class="header-logo">
-                <img src="/static/image/logo.png" alt="Logo Groupie Tracker" class="logo">
-                <a href="/"  class="nav-link">Groupie Tracker</a>
+                <img src="/static/image/logo.png" alt="Logo Group Tracker" class="logo">
+                <a href="/"  class="nav-link">Group Tracker</a>
             </div >
             <form method="GET" action="/search" class="search-form" style= "margin:0; ">
-                <input type="text" name="name" placeholder="Rechercher un artiste..." class="search-input">
-                <button type="submit" class="search-button">Rechercher</button>
+                <input type="text" name="name" placeholder="Nom d'un group ou d'un membre" class="search-input">
+                <button type="submit" class="search-button">Search</button>
             </form>
             <nav class="header-nav">
-                <a href="/" class="nav-link">Accueil</a>
-                <a href="/search" class="nav-link">Recherche</a>
-                <a href="/about" class="nav-link">À propos</a>
+                <a href="/" class="nav-link">Home</a>
+                <a href="/search" class="nav-link">Search</a>
+                <a href="/about" class="nav-link">About</a>
             </nav>
         </div>
     </header>
-
+<!-- Page Content -->
     <div class="container">
         <main class="content">
             <div class="page-header">
@@ -36,13 +44,13 @@
                     <img src="{{ .Artist.Image }}" alt="{{ .Artist.Name }}" class="artist-detail-image">
                     <div class="artist-detail-info">
                         <div class="info-section">
-                            <h3>Informations générales</h3>
-                            <p><strong>Année de création:</strong> {{ .Artist.CreationDate }}</p>
-                            <p><strong>Premier album:</strong> {{ .Artist.FirstAlbum }}</p>
+                            <h3>General Information</h3>
+                            <p><strong>Creation Year:</strong> {{ .Artist.CreationDate }}</p>
+                            <p><strong>First Album:</strong> {{ .Artist.FirstAlbum }}</p>
                         </div>
 
                         <div class="info-section">
-                            <h3>Membres</h3>
+                            <h3>Members</h3>
                             <ul class="info-list">
                                 {{ range .Artist.Members }}
                                 <li>{{ . }}</li>
@@ -52,9 +60,16 @@
                     </div>
                 </div>
 
+                {{if .Markers}}
+                <div class="info-section">
+                    <h3>Concert Map Locations</h3>
+                    <div id="map" style="height: 500px; width: 100%;"></div>
+                </div>
+                {{ end }}
+
                 {{ if .Locations }}
                 <div class="info-section">
-                    <h3>Locations des concerts</h3>
+                    <h3>Concert Locations</h3>
                     <ul class="info-list">
                         {{ range .Locations }}
                         <li>{{ . }}</li>
@@ -65,7 +80,7 @@
 
                 {{ if .Dates }}
                 <div class="info-section">
-                    <h3>Dates des concerts</h3>
+                    <h3>Concert Dates</h3>
                     <ul class="info-list">
                         {{ range .Dates }}
                         <li>{{ . }}</li>
@@ -76,7 +91,7 @@
 
                 {{ if .Relations }}
                 <div class="info-section">
-                    <h3>Relations (Dates et Locations)</h3>
+                    <h3>Relations (Dates and Locations)</h3>
                     <div class="relations-container">
                         {{ range $location, $dates := .Relations }}
                         <div class="relation-item">
@@ -93,10 +108,45 @@
                 {{ end }}
             </div>
         </main>
+    </div>
+<!-- Page bottom -->
         <footer class="site-footer">
-            <p>&copy; 2025 Groupie Tracker. Tous droits réservés.</p>
+            <p>&copy; 2025 Group Tracker. All rights reserved.</p>
         </footer>
     </div>
+
+    {{if .Markers}}
+    <script>
+        //We use the global object L for leaflet functions
+        var map = L.map('map').setView([20,0], 2); //we set the map with a view of 20 lat, 0 lon, with 2 zoom lvl (really big zoomout)
+        //we are adding the background for map with layers(rectangles merged together)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { //setting the subdomain {s} as placeholder for loadbalancing, {z} for zoom and rest for coordinates
+            //attribution is copyright necessary line
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            //maxzoom is set to 19 by default i think :d don't remember but it's just a limit
+            maxZoom: 19,
+        }).addTo(map); //at the end we are using .addTo to attatch the tile layer to the map
+
+        var markers = []; //i won't comment on this
+
+        {{range .Markers}} //Goes through concert locations
+        {{if ne .Coordinates.Lat 0.0}} //if latitude not 0 (logging purposes, because of fallback 0's in location.go code)
+        {{if ne .Coordinates.Long 0.0}} //if longitude not 0 (logging purposes, because of fallback 0's in location.go code)
+        //this creates a leaflet marker at location and adds it to the map
+        var marker = L.marker([{{.Coordinates.Lat}}, {{.Coordinates.Long}}]).addTo(map);
+        marker.bindPopup("<b>{{.Name}}</b>"); //Gives a popup with the location name in bold
+        markers.push(marker); //adds the marker to markers for later use
+        {{end}}
+        {{end}}
+        {{end}}
+
+        if (markers.length > 0) { //if any markers are added
+            var group = new L.featureGroup(markers); //Creates a group and appends all markers to it
+            map.fitBounds(group.getBounds().pad(0.1)); //Then creates bounds for all locations with extra padding (needed so that locations are not in the corner of the map)
+        }
+    </script>
+    {{end}}
+
 </body>
 </html>
 

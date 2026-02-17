@@ -2,7 +2,7 @@ package main
 
 import "group-tracker/src/server"
 
-// Déploiement du serveur
+//Server Deployment
 func main() {
 	server.Server()
 }
