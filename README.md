@@ -9,4 +9,4 @@ go run main.go
 ```
 Le serveur sera accessible sur `http://localhost:8081`
 
-Bienvenue sur Groupie Tracker, une application web permettant de rechercher des artistes et leurs concerts.
+Bienvenue sur Groupie Tracker, une application web permettant de rechercher des artistes et leurs concerts..
