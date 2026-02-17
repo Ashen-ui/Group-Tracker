@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <!--Basically using leaflet library for map handling-->    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
         crossorigin=""/>
@@ -113,27 +114,32 @@
 
     {{if .Markers}}
     <script>
-        var map = L.map('map').setView([20,0], 2);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        //We use the global object L for leaflet functions
+        var map = L.map('map').setView([20,0], 2); //we set the map with a view of 20 lat, 0 lon, with 2 zoom lvl (really big zoomout)
+        //we are adding the background for map with layers(rectangles merged together)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { //setting the subdomain {s} as placeholder for loadbalancing, {z} for zoom and rest for coordinates
+            //attribution is copyright necessary line
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            //maxzoom is set to 19 by default i think :d don't remember but it's just a limit
             maxZoom: 19,
-        }).addTo(map);
+        }).addTo(map); //at the end we are using .addTo to attatch the tile layer to the map
 
-        var markers = [];
+        var markers = []; //i won't comment on this
 
-        {{range .Markers}}
-        {{if ne .Coordinates.Lat 0.0}}
-        {{if ne .Coordinates.Long 0.0}}
+        {{range .Markers}} //Goes through concert locations
+        {{if ne .Coordinates.Lat 0.0}} //if latitude not 0 (logging purposes, because of fallback 0's in location.go code)
+        {{if ne .Coordinates.Long 0.0}} //if longitude not 0 (logging purposes, because of fallback 0's in location.go code)
+        //this creates a leaflet marker at location and adds it to the map
         var marker = L.marker([{{.Coordinates.Lat}}, {{.Coordinates.Long}}]).addTo(map);
-        marker.bindPopup("<b>{{.Name}}</b>");
-        markers.push(marker);
+        marker.bindPopup("<b>{{.Name}}</b>"); //Gives a popup with the location name in bold
+        markers.push(marker); //adds the marker to markers for later use
         {{end}}
         {{end}}
         {{end}}
 
-        if (markers.length > 0) {
-            var group = new L.featureGroup(markers);
-            map.fitBounds(group.getBounds().pad(0.1));
+        if (markers.length > 0) { //if any markers are added
+            var group = new L.featureGroup(markers); //Creates a group and appends all markers to it
+            map.fitBounds(group.getBounds().pad(0.1)); //Then creates bounds for all locations with extra padding (needed so that locations are not in the corner of the map)
         }
     </script>
     {{end}}
