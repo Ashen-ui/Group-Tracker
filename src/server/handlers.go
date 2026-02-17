@@ -11,21 +11,21 @@ import (
 )
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	// Récupération des artistes depuis l'API
+	//Getting artists from API
 	artists, err := api.GetArtists()
 	if err != nil {
 		log.Printf("Error while getting artists: %v", err)
 		http.Error(w, "Error while getting data", http.StatusInternalServerError)
 		return
 	}
-	// Parsing du template
+	//Parsing the template
 	tmpl, err := template.ParseFiles("./template/index.html")
 	if err != nil {
 		log.Printf("Error while parsing template: %v", err)
 		http.Error(w, "Template Error", http.StatusInternalServerError)
 		return
 	}
-	// Exécution du template avec les données
+	//Template execution with data
 	err = tmpl.Execute(w, artists)
 	if err != nil {
 		log.Printf("Error while executing template: %v", err)
@@ -37,7 +37,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 func aboutHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("aboutHandler: request received: %s %s", r.Method, r.URL.Path)
 
-	// Contenu par défaut pour la page À propos
+	//Default content for "A propos" Page
 	readmeContent := `Group Tracker
 
 Welcome to the group tracker, a web app that lets you discover 
@@ -124,6 +124,7 @@ type AboutPageData struct {
 type ArtistData struct {
 	Artist    api.Artist
 	Locations []string
+	Markers   []locationPcoordinates
 	Dates     []string
 	Relations map[string][]string
 }
@@ -245,10 +246,13 @@ func ArtistDetailHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
+
+	Pins := getLocations(artistLocations)
 	//Preparing data for the template
 	data := ArtistData{
 		Artist:    *artist,
 		Locations: artistLocations,
+		Markers:   Pins,
 		Dates:     artistDates,
 		Relations: artistRelations,
 	}

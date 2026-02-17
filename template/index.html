@@ -93,7 +93,7 @@
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            console.log('Data parsed, type:', typeof data, 'is array:', Array.isArray(data));
+            console.log('Data parsed, object type:', typeof data, 'is array:', Array.isArray(data));
             
             groups = Array.isArray(data) ? data : (data.value || []);
             console.log('Groups extracted:', groups.length);
@@ -192,7 +192,7 @@
             align-items: center;
             gap: 20px;
             width: 100%;
-            margin-bottom: 140px; /* extra space so circles don't overlap following content */
+            margin-bottom: 140px;
         `;
 
         const title = document.createElement('h2');

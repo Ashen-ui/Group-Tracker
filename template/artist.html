@@ -2,6 +2,12 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
     <link rel="icon" type="image/png" href="/static/image/logo.png">
     <link rel="stylesheet" href="/static/css/style.css">
     <title>{{ .Artist.Name }} - Group Tracker</title>
@@ -52,6 +58,13 @@
                     </div>
                 </div>
 
+                {{if .Markers}}
+                <div class="info-section">
+                    <h3>Concert Map Locations</h3>
+                    <div id="map" style="height: 500px; width: 100%;"></div>
+                </div>
+                {{ end }}
+
                 {{ if .Locations }}
                 <div class="info-section">
                     <h3>Concert Locations</h3>
@@ -97,6 +110,34 @@
             <p>&copy; 2025 Group Tracker. All rights reserved.</p>
         </footer>
     </div>
+
+    {{if .Markers}}
+    <script>
+        var map = L.map('map').setView([20,0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19,
+        }).addTo(map);
+
+        var markers = [];
+
+        {{range .Markers}}
+        {{if ne .Coordinates.Lat 0.0}}
+        {{if ne .Coordinates.Long 0.0}}
+        var marker = L.marker([{{.Coordinates.Lat}}, {{.Coordinates.Long}}]).addTo(map);
+        marker.bindPopup("<b>{{.Name}}</b>");
+        markers.push(marker);
+        {{end}}
+        {{end}}
+        {{end}}
+
+        if (markers.length > 0) {
+            var group = new L.featureGroup(markers);
+            map.fitBounds(group.getBounds().pad(0.1));
+        }
+    </script>
+    {{end}}
+
 </body>
 </html>
 
